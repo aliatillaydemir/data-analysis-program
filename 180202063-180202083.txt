@@ -1,0 +1,453 @@
+180202063 ali atilla aydemir
+180202083 mehmet alperen onarır
+
+					html dosyası
+******************************************************************************************************************************
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Flask Tutorial</title>
+</head>
+<body>
+<form method="POST" action=".">
+    <input type="text" name="engine" value="link...">
+    <input type="submit" value="parse"/>
+</form>
+</body>
+</html>
+
+
+******************************************************************************************************************************
+#kelime parselleme
+
+from flask import Flask, request, render_template
+import requests
+import operator
+import nltk
+from bs4 import BeautifulSoup
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET','POST'])
+def index():
+    if request.method == 'POST':
+        print(request.form.get('engine'))
+
+        def sozlukOlustur(tumKelimeler):
+            kelimeSayisi = {}
+
+            for kelime in tumKelimeler:
+                if kelime in kelimeSayisi:
+                    kelimeSayisi[kelime] += 1
+                else:
+                    kelimeSayisi[kelime] = 1
+
+            return kelimeSayisi
+
+        def sembolleritemizle(tümkelimeler):
+            sembolsuzkelimeler = []
+            semboller = "!\"'^+%&/()<>£#$½.," + chr(775)
+            for kelime in tümkelimeler:
+                for sembol in semboller:
+                    if sembol in kelime:
+                        kelime = kelime.replace(sembol, "")
+                if (len(kelime) > 1):
+                    sembolsuzkelimeler.append(kelime)
+            return sembolsuzkelimeler
+
+        def baglaclaritemizle(tümkelimeler):
+            baglaclar = ["and", "or", "but", "however", "maybe", "even", "with", "because", "in", "on", "from", "even if",
+                         "cause", "more", "to", "the", "this", "here", "still"]
+            for kelime in tümkelimeler:
+                for baglac in baglaclar:
+                    if (baglac == kelime):
+                        tümkelimeler.remove(kelime)
+
+            return tümkelimeler
+
+        url = request.form.get('engine')
+
+        tümkelimeler = []
+        r = requests.get(url)
+        soup = BeautifulSoup(r.content, "html.parser")
+
+        for kelimegrupları in soup.find_all("p"):
+            içerik = kelimegrupları.text
+            kelimeler = içerik.lower().split()
+            # print(kelimeler)
+
+            for kelime in kelimeler:
+                tümkelimeler.append(kelime)
+
+        tümkelimeler = sembolleritemizle(tümkelimeler)
+        tümkelimeler = baglaclaritemizle(tümkelimeler)
+
+        tümkelimelerSon = sozlukOlustur(tümkelimeler)
+
+        for anahtar, deger in sorted(tümkelimelerSon.items(), reverse=True,key=operator.itemgetter(1)):
+            print(anahtar, deger)
+
+       # return request.form.get('engine')
+    return render_template('index.html')
+
+
+
+@app.route("/secondpage", methods=['GET','POST'])
+def second():
+    if request.method == 'POST':
+        print(request.form.get('search'))
+    return render_template('secondpage.html')
+
+
+@app.route("/ucuncusayfa", methods=['GET','POST'])
+def third():
+    #if request.method == 'POST':
+
+
+       # list.append(request.form.get('cluster'))
+       # print(list)
+
+    return render_template('ucuncusayfa.html')
+
+
+@app.route("/dort")
+def semantik():
+    return render_template('dort.html')
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+****************************************************************************************************************************
+#anahtar kelime çıkarma
+
+from flask import Flask, request, render_template
+import requests
+import operator
+import nltk
+from bs4 import BeautifulSoup
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET','POST'])
+def index():
+    if request.method == 'POST':
+        print(request.form.get('engine'))
+
+        print("anahtar kelimeler:")
+
+        def sozlukOlustur(tumKelimeler):
+            kelimeSayisi = {}
+
+            for kelime in tumKelimeler:
+                if kelime in kelimeSayisi:
+                    kelimeSayisi[kelime] += 1
+                else:
+                    kelimeSayisi[kelime] = 1
+
+            return kelimeSayisi
+
+        def sembolleritemizle(tümkelimeler):
+            sembolsuzkelimeler = []
+            semboller = "!\"'^+%&/()[]<>£#$½.,?0123456789:;-*" + chr(775)
+            for kelime in tümkelimeler:
+                for sembol in semboller:
+                    if sembol in kelime:
+                        kelime = kelime.replace(sembol, "")
+                if (len(kelime) > 1):
+                    sembolsuzkelimeler.append(kelime)
+            return sembolsuzkelimeler
+
+        def baglaclaritemizle(tümkelimeler):
+
+            baglaclar = ["of", "in", "to", "but", "so", "while", "th", "the", "he", "not", "his", "her", "and", "an",
+                         "is", "as", "by", "are", "was", "for", "from", "which", "has", "have", "with", "were", "on",
+                         "at", "that", "this", "there", "their", "than", "it", "or", ]
+            for kelime in tümkelimeler:
+                for baglac in baglaclar:
+                    if (baglac == kelime):
+                        tümkelimeler.remove(baglac)
+
+            return tümkelimeler
+
+        def köklerineAyir(tümKelimeler):
+            sno = nltk.stem.SnowballStemmer('english')
+
+            yeniHal = []
+
+            for kelime in tümKelimeler:
+                kelime = sno.stem(kelime)
+
+                yeniHal.append(kelime)
+            return yeniHal
+
+        url = request.form.get('engine')
+
+        tümkelimeler = []
+        r = requests.get(url)
+        soup = BeautifulSoup(r.content, "html.parser")
+
+        for kelimegrupları in soup.find_all("p"):
+            içerik = kelimegrupları.text
+            kelimeler = içerik.lower().split()
+            # print(kelimeler)
+
+            for kelime in kelimeler:
+                tümkelimeler.append(kelime)
+
+        tümkelimelerSembolsuz = sembolleritemizle(tümkelimeler)
+        tümkelimelerBaglacsiz = baglaclaritemizle(tümkelimelerSembolsuz)
+        tümkelimelerKok = köklerineAyir(tümkelimelerBaglacsiz)
+        tümkelimelerSon = sozlukOlustur(tümkelimelerKok)
+
+        anahtarKelime = {}
+        sayac = 0;
+
+        for anahtar, deger in sorted(tümkelimelerSon.items(), reverse=True, key=operator.itemgetter(1)):
+            if (
+                    anahtar == "and" or anahtar == "the" or anahtar == "his" or anahtar == "was" or anahtar == "is" or anahtar == "in"):
+                continue
+            else:
+
+                anahtarKelime[anahtar] = deger
+                sayac += 1
+                if (sayac > 9):
+                    break
+
+        # sembolleri çıkardık, baglacları cıkardık, kök ayırdık, sözlük olusturduk, en cok tekrarlanan 10 sectik , araya kacan baglacları if le tekrar yakaladım
+
+        # seçilen anahtar kelimeler burada basılıyor
+        for kelime in anahtarKelime:
+            print(kelime, anahtarKelime[kelime])
+       # return request.form.get('engine')
+    return render_template('index.html')
+
+
+
+@app.route("/secondpage", methods=['GET','POST'])
+def second():
+    if request.method == 'POST':
+        print(request.form.get('search'))
+    return render_template('secondpage.html')
+
+
+@app.route("/ucuncusayfa", methods=['GET','POST'])
+def third():
+    #if request.method == 'POST':
+
+
+       # list.append(request.form.get('cluster'))
+       # print(list)
+
+    return render_template('ucuncusayfa.html')
+
+
+@app.route("/dort")
+def semantik():
+    return render_template('dort.html')
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+****************************************************************************************************************************
+# Benzerlik Skoru Hesaplama
+# her iki url için en çok tekrar eden 10 kök(ingilizce) kelimeyi hesaplar
+
+import requests
+import operator
+import nltk
+
+from bs4 import BeautifulSoup
+
+def benzerlikSkoruHesaplama(anahtarserisi1, anahtarserisi2):
+    taban1=0
+    taban2=0
+    üst1=0
+    üst2=0
+    for kelime in anahtarserisi1:
+        taban1+=anahtarserisi1[kelime]
+    for kelime2 in anahtarserisi2:
+        taban2+=anahtarserisi2[kelime2]
+
+    for kelime1 in anahtarserisi1:
+        for kelime2 in anahtarserisi2:
+            if(kelime1==kelime2):
+                üst1 += anahtarserisi1[kelime1]
+                üst2 += anahtarserisi2[kelime2]
+    skor = (üst1 * üst2) / (taban1 * taban2)
+    if(skor>1):
+        skor=1
+    return skor
+
+
+
+def sozlukOlustur(tumKelimeler):
+    kelimeSayisi = {}
+
+    for kelime in tumKelimeler:
+        if kelime in kelimeSayisi:
+            kelimeSayisi[kelime]+=1
+        else:
+             kelimeSayisi[kelime] = 1
+
+    return kelimeSayisi
+
+
+def sembolleritemizle(tümkelimeler):
+   sembolsuzkelimeler = []
+   semboller = "!\"'^+%&/()[]<>£#$½.,?0123456789:;-*" + chr(775)
+   for kelime in tümkelimeler:
+      for sembol in semboller:
+         if sembol in kelime:
+            kelime = kelime.replace(sembol,"")
+      if(len(kelime)>1):
+         sembolsuzkelimeler.append(kelime)
+   return  sembolsuzkelimeler
+
+
+def baglaclaritemizle(tümkelimeler):
+
+    baglaclar = ["of","in","to","but","so","while","th","the","he","not","his","her","and","an","is","as","by","are","was","for","from","which","has","have","with","were","on","at","that","this","there","their","than","it","or",]
+    for kelime in tümkelimeler:
+        for baglac in baglaclar:
+            if (baglac == kelime ):
+
+                tümkelimeler.remove(baglac)
+
+    return tümkelimeler
+
+
+
+
+
+
+
+def köklerineAyir(tümKelimeler):
+    sno = nltk.stem.SnowballStemmer('english')
+
+    yeniHal  = []
+
+    for kelime in tümKelimeler:
+
+        kelime = sno.stem(kelime)
+
+        yeniHal.append(kelime)
+    return  yeniHal
+
+
+
+url ="https://en.wikipedia.org/wiki/Greek_Dark_Ages"
+url2 ="https://en.wikipedia.org/wiki/Ancient_Greek"
+
+
+
+tümkelimeler=[]
+r=requests.get(url)
+soup = BeautifulSoup(r.content, "html.parser")
+
+for kelimegrupları in soup.find_all("p"):
+   içerik = kelimegrupları.text
+   kelimeler = içerik.lower().split()
+   #print(kelimeler)
+
+   for kelime in kelimeler:
+      tümkelimeler.append(kelime)
+
+
+tümkelimelerSembolsuz = sembolleritemizle(tümkelimeler)
+tümkelimelerBaglacsiz = baglaclaritemizle(tümkelimelerSembolsuz)
+tümkelimelerKok = köklerineAyir(tümkelimelerBaglacsiz)
+tümkelimelerSon = sozlukOlustur(tümkelimelerKok)
+
+
+
+
+
+anahtarKelime = {}
+sayac=0;
+
+
+print("1. url anahtar kelimeleri")
+
+
+for anahtar,deger in sorted(tümkelimelerSon.items(),reverse=True,key = operator.itemgetter(1)):
+    if(anahtar=="and" or anahtar=="the" or anahtar=="his" or anahtar=="was" or anahtar=="is" or anahtar=="in"):
+        continue
+    else:
+
+        anahtarKelime[anahtar]=deger
+        sayac+=1
+        if(sayac>9):
+            break
+
+
+
+# sembolleri çıkardık, baglacları cıkardık, kök ayırdık, sözlük olusturduk, en cok tekrarlanan 10 sectik , araya kacan baglacları if le tekrar yakaladım
+
+# seçilen anahtar kelimeler burada basılıyor
+for kelime in anahtarKelime:
+    print(kelime,anahtarKelime[kelime])
+
+
+
+
+
+
+tümkelimeler2=[]
+r=requests.get(url2)
+soup = BeautifulSoup(r.content, "html.parser")
+
+for kelimegrupları in soup.find_all("p"):
+   içerik = kelimegrupları.text
+   kelimeler = içerik.lower().split()
+   #print(kelimeler)
+
+   for kelime in kelimeler:
+      tümkelimeler2.append(kelime)
+
+
+tümkelimelerSembolsuz = sembolleritemizle(tümkelimeler2)
+tümkelimelerBaglacsiz = baglaclaritemizle(tümkelimelerSembolsuz)
+tümkelimelerKok = köklerineAyir(tümkelimelerBaglacsiz)
+tümkelimelerSon = sozlukOlustur(tümkelimelerKok)
+
+
+
+
+
+anahtarKelime2 = {}
+sayac=0;
+
+
+print("2. url anahtar kelimeleri")
+
+for anahtar,deger in sorted(tümkelimelerSon.items(),reverse=True,key = operator.itemgetter(1)):
+    if(anahtar=="and" or anahtar=="the" or anahtar=="his" or anahtar=="was" or anahtar=="is" or anahtar=="in"):
+        continue
+    else:
+
+        anahtarKelime2[anahtar]=deger
+        sayac+=1
+        if(sayac>9):
+            break
+
+
+
+# sembolleri çıkardık, baglacları cıkardık, kök ayırdık, sözlük olusturduk, en cok tekrarlanan 10 sectik , araya kacan baglacları if le tekrar yakaladım
+
+# seçilen anahtar kelimeler burada basılıyor
+for kelime in anahtarKelime2:
+    print(kelime,anahtarKelime2[kelime])
+
+
+
+Skor = benzerlikSkoruHesaplama(anahtarKelime,anahtarKelime2)
+
+print("Benzerlik Skoru ===>> " ,Skor*100) # % skor formatında veriyor skor max 1 döner
+

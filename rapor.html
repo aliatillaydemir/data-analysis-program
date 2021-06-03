@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+.container {
+  height: 50px;
+  position: relative;
+  border: 3px solid cadetblue;
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+</style>
+
+    <meta charset="UTF-8">
+    <title>YAZLAB RAPORU</title>
+</head>
+
+<p>
+
+<div class="container">
+  <div class="center">
+    <h1>WEB İNDEXLEME PROJESİ</h1>
+  </div>
+</div>
+
+<p>ALİ ATİLLA AYDEMİR              180202063</p>       <p>MEHMET ALPEREN ONARIR              180202083</p>
+<img src="link.png" />
+<p>projede bizi bir arama çubuğu karşılar. ve bu çubuğa bir link girmemiz istenir. linke girdikten sonra enter tuşuna ya da çubuğun hemen yanındaki parse butonuna tıklanabilir.</p>
+<p>bu işlemler gerçekleştikten sonra programı çalıştırdığımız idede linkini attığımız sayfadaki kelimeleri ve bu kelimelerin frekanslarını görebiliriz.</p>
+<p>kelimeler frekanslarına göre büyükten küçüğe sıralanmıştır.</p>
+<br/>
+<img src="link2.png" />
+
+<p>ikinci sayfada ise anahtar kelimeler bulunur.</p>
+<img src="anahtar.png" />
+<p>girilen link doğrultusunda, köklere göre en fazla sıralanan 10 kelime çıktı alınır. burada linki verilen her iki sayfanın da anahtar kelimeleri bulunmuş olur ve 3. aşama olan benzerlik oranı hesabı yapılır.</p>
+<p>2. ve 3. aşama olan anahtar kelime- benzerlik hesabı tek sayfada yapılmıştır.</p>
+<p> benzerlik oranı formülü şu şekildedir:  ((f1+f2)/v)</p>
+<p> anahtar kelime sayılarının toplamı/tüm anahtar kelimeler</p>
+<p>f1: 1.url toplam anahtar kelime sayıları<br/>
+f2: 2. url toplam anahtar kelime sayıları<br/>
+v: tüm anahtar kelime sayıları
+</p>
+<img src="benzerlik_skor.png" />
+
+
+
+
+
+<br>projede sayfadaki kelimeleri ayrıştırmak için beautifulsoup </br>
+browsera bağlanabilmek ve çeşitli işlemler yapabilmek için flask kullanılmıştır.</br>
+bunun yanında kelimelerin kökü için nltk modülü entegre edilmiştir. bu sayede anahtar kelimelerle ve benzerlik skorlarıyla ilgili çalışmalar yapılmıştır.
+</p>
+
+<h3>KAYNAKÇA</h3>
+
+<p>
+https://www.geeksforgeeks.org/python-stemming-words-with-nltk/	<br/>
+https://www.sinanerdinc.com/python-beautifulsoup-modulu<br/>
+https://pypi.org/project/requests/<br/>
+https://stackoverflow.com/questions/21566649/flask-button-run-python-without-refreshing-page?noredirect=1&lq=1	<br/>
+</p>
+
+<h5>... TEŞEKKÜRLER ...</h5>
+
+</body>
+</html>
